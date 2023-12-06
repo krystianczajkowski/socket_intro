@@ -26,8 +26,15 @@ int main(int argc, char *argv[]) {
 
     sa.sin_family = AF_INET;
     sa.sin_addr.s_addr = INADDR_ANY;
-    // inet_pton(AF_INET, "192.168.0.12", &sa.sin_addr.s_addr);
+    // inet_pton(AF_INET, "172.168.0.7", &sa.sin_addr.s_addr);
     sa.sin_port = htons(port);
+
+    char ip_str[INET_ADDRSTRLEN];
+    if (inet_ntop(AF_INET, &sa.sin_addr.s_addr, ip_str, sizeof(ip_str)) != NULL) 
+        printf("%s\n", ip_str);
+    else { 
+        error("inet_ntop");
+    }
 
     if ((bind(sockfd, (struct sockaddr *)&sa, sizeof(sa))) == -1) {
         error("Error on bind");
@@ -40,7 +47,14 @@ int main(int argc, char *argv[]) {
     if ((newfd = accept(sockfd, (struct sockaddr *)&ca, &ca_len)) == -1) {
         error("Error on accept");
     }
-    char buffer[255];
+
+    if (inet_ntop(AF_INET, &ca.sin_addr.s_addr, ip_str, sizeof(ip_str)) != NULL) 
+        printf("%s\n", ip_str);
+    else { 
+        error("inet_ntop");
+    }
+
+    char buffer[4096];
     while (1) {
         memset(&buffer, 0, sizeof(buffer));
         if ((read(newfd, buffer, sizeof(buffer))) == -1) {
